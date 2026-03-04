@@ -1,0 +1,20 @@
+{
+  "name": "programming-zero-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "generate": "tsx src/cli.ts",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "vitest": "^3.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0"
+  }
+}
