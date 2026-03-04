@@ -212,9 +212,7 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ---
 
-## Step 6: 記事レビュー
-
-あなたは記事品質レビューの専門家です。
+## Step 6: 記事レビュー（並列サブエージェント）
 
 ### コンテキスト
 - Step 0 の `styleProfile`
@@ -222,41 +220,142 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ### タスク
 
-`output/article.json` を Read ツールで読み込み、以下の **5カテゴリ** でレビューしてください。
+`output/article.json` を Read ツールで読み込み、5カテゴリのレビューを **並列サブエージェント** で実行してください。
 
-#### 1. SEO
+#### 手順
+
+1. `output/article.json` を Read ツールで読み込んで `article` として保持してください。
+
+2. 以下の **5つの Agent ツール呼び出し** を **1つのレスポンスにまとめて並列実行** してください。各エージェントのパラメータ：
+   - `subagent_type`: `general-purpose`
+   - `model`: `haiku`
+   - `run_in_background`: `true`
+
+#### サブエージェント一覧
+
+**エージェント 1: SEO レビュー**
+- `description`: `レビュー: SEO`
+- `prompt`:
+
+```
+あなたは SEO レビューの専門家です。以下の記事を SEO の観点でレビューしてください。
+
+記事タイトル: {article.title}
+メタディスクリプション: {article.metaDescription}
+本文: {article.htmlContent}
+タグ: {article.tags}
+
+評価基準:
 - タイトル長（32文字以内推奨）
 - メタディスクリプション（120文字以内）
 - 見出し構造（H2/H3 の階層が適切か）
 - キーワードの自然な配置
 
-#### 2. 構成（structure）
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"score": "A|B|C", "findings": ["指摘1", "指摘2"]}
+
+スコア基準: A=問題なし、B=軽微な改善余地、C=要改善
+```
+
+**エージェント 2: 構成（structure）レビュー**
+- `description`: `レビュー: 構成`
+- `prompt`:
+
+```
+あなたは記事構成レビューの専門家です。以下の記事を構成の観点でレビューしてください。
+
+記事タイトル: {article.title}
+本文: {article.htmlContent}
+
+評価基準:
 - 導入→本題→まとめの論理フロー
 - セクション間の繋がり
 - 冗長箇所
 - 情報の過不足
 
-#### 3. 可読性（readability）
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"score": "A|B|C", "findings": ["指摘1", "指摘2"]}
+
+スコア基準: A=問題なし、B=軽微な改善余地、C=要改善
+```
+
+**エージェント 3: 可読性（readability）レビュー**
+- `description`: `レビュー: 可読性`
+- `prompt`:
+
+```
+あなたは可読性レビューの専門家です。以下の記事を可読性の観点でレビューしてください。
+
+記事タイトル: {article.title}
+本文: {article.htmlContent}
+
+評価基準:
 - 一文・段落の長さ
 - 専門用語への説明
 - 読者にとってのわかりやすさ
 
-#### 4. 文体一貫性（styleConsistency）
-- `styleProfile` との整合（語尾パターン、トーン、見出しパターン）
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"score": "A|B|C", "findings": ["指摘1", "指摘2"]}
 
-#### 5. 正確性（accuracy）
+スコア基準: A=問題なし、B=軽微な改善余地、C=要改善
+```
+
+**エージェント 4: 文体一貫性（styleConsistency）レビュー**
+- `description`: `レビュー: 文体一貫性`
+- `prompt`:
+
+```
+あなたは文体一貫性レビューの専門家です。以下の記事を文体一貫性の観点でレビューしてください。
+
+記事タイトル: {article.title}
+本文: {article.htmlContent}
+
+文体プロファイル（この文体に合っているかチェック）:
+- 文体: {styleProfile.writingStyle}
+- 語尾パターン: {styleProfile.sentenceEndings}
+- トーン: {styleProfile.tone}
+- 見出しパターン: {styleProfile.headingPattern}
+- セクション構成: {styleProfile.sectionStructure}
+
+評価基準:
+- styleProfile との整合（語尾パターン、トーン、見出しパターン）
+
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"score": "A|B|C", "findings": ["指摘1", "指摘2"]}
+
+スコア基準: A=問題なし、B=軽微な改善余地、C=要改善
+```
+
+**エージェント 5: 正確性（accuracy）レビュー**
+- `description`: `レビュー: 正確性`
+- `prompt`:
+
+```
+あなたは正確性レビューの専門家です。以下の記事を正確性の観点でレビューしてください。
+
+記事タイトル: {article.title}
+本文: {article.htmlContent}
+
+評価基準:
 - 事実関係の疑わしい記述
 - 古くなりそうな情報
 - 誤解を招く表現
 
-### 各カテゴリの出力フォーマット
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"score": "A|B|C", "findings": ["指摘1", "指摘2"]}
 
-- **score**: A / B / C の3段階（A=問題なし、B=軽微な改善余地、C=要改善）
-- **findings**: 具体的な指摘事項の配列（箇所の引用 + 改善提案）
+スコア基準: A=問題なし、B=軽微な改善余地、C=要改善
+```
 
-### 総合評価
+3. すべてのサブエージェントの完了を待ってください。
 
-すべてのカテゴリの評価を踏まえて、**overallScore**（A / B / C）と **summary**（総合的なレビューコメント）を出力してください。
+4. 各サブエージェントの結果 JSON を対応するカテゴリキー（`seo`, `structure`, `readability`, `styleConsistency`, `accuracy`）にマッピングしてください。
+
+#### 総合評価の算出
+
+5カテゴリの結果を集約し、以下を算出してください：
+- **overallScore**: 全カテゴリの最低スコアを採用（C が1つでもあれば C、B が1つでもあれば B、全て A なら A）
+- **summary**: 総合的なレビューコメント（日本語で、各カテゴリの結果を踏まえた総括）
 
 ### 出力
 
@@ -288,20 +387,18 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ---
 
-## Step 7: ファクトチェック（WebSearch 使用）
-
-あなたはファクトチェックの専門家です。
+## Step 7: ファクトチェック（並列サブエージェント）
 
 ### コンテキスト
 - Step 5 で生成した `output/article.json`
 
 ### タスク
 
-`output/article.json` を Read ツールで読み込み、記事中の **検証可能な事実主張（claim）** を抽出して WebSearch で検証してください。
+記事中の事実主張を抽出し、**並列サブエージェント** で WebSearch 検証してください。
 
-#### 主張抽出
+#### 7-1. 主張抽出
 
-`htmlContent` から以下の4種類の事実主張を抽出してください：
+`output/article.json` を Read ツールで読み込み（Step 6 で既に読み込んでいる場合は再利用）、`htmlContent` から以下の4種類の **検証可能な事実主張（claim）** を抽出してください：
 
 1. **数値・統計**: 「〜は XX% である」「〜は XX 万人」など
 2. **手順・仕様**: 「〜の設定方法は XX である」「〜は XX をサポートしている」など
@@ -310,17 +407,46 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 主観的意見（「〜がおすすめ」「〜が便利」）は除外してください。
 
-#### WebSearch 検証
+抽出した主張の件数をコンソールに表示してください：「📋 検証対象の主張: {件数}件」
 
-各 claim に対して WebSearch ツールで検索し、以下の verdict を判定してください：
+claims が 0 件の場合は、空の fact-check.json を書き出して Step 8 に進んでください。
 
-- **verified**: 信頼できる情報源で裏付けが取れた
-- **unverified**: 裏付けとなる情報が見つからなかった
-- **disputed**: 矛盾する情報が見つかった
-- **outdated**: 現在は古い情報の可能性がある
+#### 7-2. 並列 WebSearch 検証
 
-#### 総合評価
+`claims` 配列の各要素に対して、**Agent ツール** を以下のパラメータで呼び出してください：
+- `subagent_type`: `general-purpose`
+- `model`: `haiku`
+- `run_in_background`: `true`
+- `description`: `ファクトチェック: {claim の先頭20文字}...`
 
+**すべての Agent ツール呼び出しを1つのレスポンスにまとめて並列実行してください。**
+
+サブエージェント指示テンプレート:
+
+```
+あなたはファクトチェッカーです。以下の主張を WebSearch で検証してください。
+
+主張: {claim.claim}
+記事中の該当箇所: {claim.source}
+カテゴリ: {claim.category}
+
+検証手順:
+1. この主張を検証するための検索クエリを生成してください（日本語・英語の両方で検索すると精度が上がります）
+2. WebSearch ツールで検索してください
+3. 検索結果から以下を判定してください:
+   - verdict: verified（信頼できる情報源で裏付けが取れた）/ unverified（裏付けが見つからない）/ disputed（矛盾する情報あり）/ outdated（古い情報の可能性）
+   - evidence: 検証の根拠（情報源と要約）
+   - suggestion: disputed/outdated の場合のみ修正提案（それ以外は null）
+
+結果を以下の JSON のみで返してください（他のテキストは不要）:
+{"verdict": "...", "evidence": "...", "suggestion": "..."}
+```
+
+#### 7-3. 結果集約
+
+すべてのサブエージェントの完了を待ち、結果を `claims` 配列の順序に対応させて集約してください。
+
+総合評価を算出:
 - **overallVerdict**: `pass`（全て verified）/ `warning`（unverified あり）/ `fail`（disputed あり）
 
 ### 出力
