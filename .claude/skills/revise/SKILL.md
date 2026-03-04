@@ -288,7 +288,76 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ---
 
-## Step 7: WordPress 記事更新（オプション）
+## Step 7: ファクトチェック（WebSearch 使用）
+
+あなたはファクトチェックの専門家です。
+
+### コンテキスト
+- Step 5 で生成した `output/article.json`
+
+### タスク
+
+`output/article.json` を Read ツールで読み込み、記事中の **検証可能な事実主張（claim）** を抽出して WebSearch で検証してください。
+
+#### 主張抽出
+
+`htmlContent` から以下の4種類の事実主張を抽出してください：
+
+1. **数値・統計**: 「〜は XX% である」「〜は XX 万人」など
+2. **手順・仕様**: 「〜の設定方法は XX である」「〜は XX をサポートしている」など
+3. **因果関係**: 「〜すると XX になる」「〜の原因は XX である」など
+4. **固有名詞の属性**: 「XX は YY 社が提供している」「XX は YYYY 年にリリースされた」など
+
+主観的意見（「〜がおすすめ」「〜が便利」）は除外してください。
+
+#### WebSearch 検証
+
+各 claim に対して WebSearch ツールで検索し、以下の verdict を判定してください：
+
+- **verified**: 信頼できる情報源で裏付けが取れた
+- **unverified**: 裏付けとなる情報が見つからなかった
+- **disputed**: 矛盾する情報が見つかった
+- **outdated**: 現在は古い情報の可能性がある
+
+#### 総合評価
+
+- **overallVerdict**: `pass`（全て verified）/ `warning`（unverified あり）/ `fail`（disputed あり）
+
+### 出力
+
+結果を以下の JSON フォーマットで `output/fact-check.json` に Write ツールで書き出してください：
+
+```json
+{
+  "checkedAt": "ISO 8601形式の現在日時",
+  "articleTitle": "記事タイトル",
+  "claims": [
+    {
+      "claim": "主張の内容",
+      "source": "記事中の該当箇所",
+      "category": "数値・統計 | 手順・仕様 | 因果関係 | 固有名詞の属性",
+      "verdict": "verified | unverified | disputed | outdated",
+      "evidence": "検証の根拠",
+      "suggestion": "修正提案（該当時のみ、それ以外は null）"
+    }
+  ],
+  "verifiedCount": 0,
+  "totalCount": 0,
+  "overallVerdict": "pass | warning | fail",
+  "summary": "総合コメント"
+}
+```
+
+### コンソール表示
+
+- 各 claim の verdict を一覧表示（verified=✅、unverified=❓、disputed=❌、outdated=⏰）
+- disputed / outdated の claim は evidence と suggestion を含めて強調表示
+- `fail`（disputed あり）の場合は該当箇所を強調表示
+- 総合評価とサマリーを最後に表示
+
+---
+
+## Step 8: WordPress 記事更新（オプション）
 
 `$ARGUMENTS` に `--local` が含まれている場合は、このステップをスキップしてください。
 `output/article.json` の保存のみで完了です。
@@ -312,4 +381,5 @@ npx tsx scripts/wp-update-post.ts {originalArticle.id} output/article.json
 - 主な改善点（箇条書き3〜5個）
 - `output/article.json` のパス
 - レビュー結果の総合評価（`output/review.json`）
+- ファクトチェック結果の総合判定（`output/fact-check.json`）
 - WordPress を更新した場合は編集 URL
