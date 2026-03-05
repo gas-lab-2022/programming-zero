@@ -14,6 +14,29 @@ disable-model-invocation: true
 
 ---
 
+## セッションディレクトリの作成
+
+複数セッションの同時実行でファイルが競合しないよう、セッション固有の出力ディレクトリを使用します。
+
+### 手順
+
+1. `$ARGUMENTS` から記事 URL を抽出し、URL のスラッグ部分を取得してください（`--local` フラグは除外）。
+   - 例: `https://example.com/react-hooks-guide/` → `react-hooks-guide`
+   - 例: `https://example.com/?p=123` → `p123`
+2. 以下の Bash コマンドでセッションディレクトリを作成してください（`<slug>` は手順 1 の値に置換）：
+
+```bash
+SESSION_DIR="output/$(date +%Y%m%d-%H%M%S)-edit-<slug>"
+mkdir -p "$SESSION_DIR"
+echo "$SESSION_DIR"
+```
+
+3. 出力されたパスを `sessionDir` として保持してください（例: `output/20260305-143000-edit-react-hooks-guide`）。
+
+以降、すべての出力ファイルは `{sessionDir}/` 配下に書き出します。
+
+---
+
 ## Step 0: 文体ロード（キャッシュ対応）
 
 あなたは文体分析の専門家です。
@@ -189,7 +212,7 @@ After:  「変更後のテキスト」
 
 ### タスク
 
-`currentArticle` を `output/article.json` に書き出してください。
+`currentArticle` を `{sessionDir}/article.json` に書き出してください。
 
 ### フォーマット
 
@@ -202,7 +225,7 @@ After:  「変更後のテキスト」
 }
 ```
 
-Write ツールで `output/article.json` に書き出してください。
+Write ツールで `{sessionDir}/article.json` に書き出してください。
 
 ---
 
@@ -210,15 +233,15 @@ Write ツールで `output/article.json` に書き出してください。
 
 ### コンテキスト
 - Step 0 の `styleProfile`
-- Step 4 で書き出した `output/article.json`
+- Step 4 で書き出した `{sessionDir}/article.json`
 
 ### タスク
 
-`output/article.json` を Read ツールで読み込み、5カテゴリのレビューを **並列サブエージェント** で実行してください。
+`{sessionDir}/article.json` を Read ツールで読み込み、5カテゴリのレビューを **並列サブエージェント** で実行してください。
 
 #### 手順
 
-1. `output/article.json` を Read ツールで読み込んで `article` として保持してください。
+1. `{sessionDir}/article.json` を Read ツールで読み込んで `article` として保持してください。
 
 2. 以下の **5つの Agent ツール呼び出し** を **1つのレスポンスにまとめて並列実行** してください。各エージェントのパラメータ：
    - `subagent_type`: `general-purpose`
@@ -353,7 +376,7 @@ Write ツールで `output/article.json` に書き出してください。
 
 ### 出力
 
-結果を以下の JSON フォーマットで `output/review.json` に Write ツールで書き出してください：
+結果を以下の JSON フォーマットで `{sessionDir}/review.json` に Write ツールで書き出してください：
 
 ```json
 {
@@ -395,14 +418,14 @@ AskUserQuestion ツールで最終確認を行ってください：
   - 「ローカル保存のみで終了」: WP 更新をスキップして完了
 
 `$ARGUMENTS` に `--local` が含まれている場合は、このステップをスキップしてください。
-`output/article.json` の保存のみで完了です。
+`{sessionDir}/article.json` の保存のみで完了です。
 
 ### 6-2. WordPress 更新
 
 「更新する」が選択された場合、以下の Bash コマンドを実行してください：
 
 ```bash
-npx tsx scripts/wp-update-post.ts {originalArticle.id} output/article.json
+npx tsx scripts/wp-update-post.ts {originalArticle.id} {sessionDir}/article.json
 ```
 
 更新が成功したら、Post ID と編集 URL を表示してください。
@@ -414,6 +437,6 @@ npx tsx scripts/wp-update-post.ts {originalArticle.id} output/article.json
 以下をまとめて報告してください：
 - 記事タイトル
 - 修正した箇所の概要（箇条書き）
-- `output/article.json` のパス
-- レビュー結果の総合評価（`output/review.json`）
+- `{sessionDir}/article.json` のパス
+- レビュー結果の総合評価（`{sessionDir}/review.json`）
 - WordPress を更新した場合は編集 URL

@@ -12,6 +12,29 @@ disable-model-invocation: true
 
 ---
 
+## セッションディレクトリの作成
+
+複数セッションの同時実行でファイルが競合しないよう、セッション固有の出力ディレクトリを使用します。
+
+### 手順
+
+1. `$ARGUMENTS` から記事 URL を抽出し、URL のスラッグ部分を取得してください（`--local`, `--refresh-style` フラグは除外）。
+   - 例: `https://example.com/react-hooks-guide/` → `react-hooks-guide`
+   - 例: `https://example.com/?p=123` → `p123`
+2. 以下の Bash コマンドでセッションディレクトリを作成してください（`<slug>` は手順 1 の値に置換）：
+
+```bash
+SESSION_DIR="output/$(date +%Y%m%d-%H%M%S)-revise-<slug>"
+mkdir -p "$SESSION_DIR"
+echo "$SESSION_DIR"
+```
+
+3. 出力されたパスを `sessionDir` として保持してください（例: `output/20260305-143000-revise-react-hooks-guide`）。
+
+以降、すべての出力ファイルは `{sessionDir}/` 配下に書き出します。
+
+---
+
 ## Step 0: 文体ロード（キャッシュ対応）
 
 あなたは文体分析の専門家です。
@@ -208,7 +231,7 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 }
 ```
 
-生成した JSON を `output/article.json` にファイルとして書き出してください（Write ツールを使用）。
+生成した JSON を `{sessionDir}/article.json` にファイルとして書き出してください（Write ツールを使用）。
 
 ---
 
@@ -216,15 +239,15 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ### コンテキスト
 - Step 0 の `styleProfile`
-- Step 5 で生成した `output/article.json`
+- Step 5 で生成した `{sessionDir}/article.json`
 
 ### タスク
 
-`output/article.json` を Read ツールで読み込み、5カテゴリのレビューを **並列サブエージェント** で実行してください。
+`{sessionDir}/article.json` を Read ツールで読み込み、5カテゴリのレビューを **並列サブエージェント** で実行してください。
 
 #### 手順
 
-1. `output/article.json` を Read ツールで読み込んで `article` として保持してください。
+1. `{sessionDir}/article.json` を Read ツールで読み込んで `article` として保持してください。
 
 2. 以下の **5つの Agent ツール呼び出し** を **1つのレスポンスにまとめて並列実行** してください。各エージェントのパラメータ：
    - `subagent_type`: `general-purpose`
@@ -359,7 +382,7 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 ### 出力
 
-結果を以下の JSON フォーマットで `output/review.json` に Write ツールで書き出してください：
+結果を以下の JSON フォーマットで `{sessionDir}/review.json` に Write ツールで書き出してください：
 
 ```json
 {
@@ -390,7 +413,7 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 ## Step 7: ファクトチェック（並列サブエージェント）
 
 ### コンテキスト
-- Step 5 で生成した `output/article.json`
+- Step 5 で生成した `{sessionDir}/article.json`
 
 ### タスク
 
@@ -398,7 +421,7 @@ npx tsx scripts/wp-fetch-post-by-url.ts <記事URL>
 
 #### 7-1. 主張抽出
 
-`output/article.json` を Read ツールで読み込み（Step 6 で既に読み込んでいる場合は再利用）、`htmlContent` から以下の4種類の **検証可能な事実主張（claim）** を抽出してください：
+`{sessionDir}/article.json` を Read ツールで読み込み（Step 6 で既に読み込んでいる場合は再利用）、`htmlContent` から以下の4種類の **検証可能な事実主張（claim）** を抽出してください：
 
 1. **数値・統計**: 「〜は XX% である」「〜は XX 万人」など
 2. **手順・仕様**: 「〜の設定方法は XX である」「〜は XX をサポートしている」など
@@ -451,7 +474,7 @@ claims が 0 件の場合は、空の fact-check.json を書き出して Step 8 
 
 ### 出力
 
-結果を以下の JSON フォーマットで `output/fact-check.json` に Write ツールで書き出してください：
+結果を以下の JSON フォーマットで `{sessionDir}/fact-check.json` に Write ツールで書き出してください：
 
 ```json
 {
@@ -486,12 +509,12 @@ claims が 0 件の場合は、空の fact-check.json を書き出して Step 8 
 ## Step 8: WordPress 記事更新（オプション）
 
 `$ARGUMENTS` に `--local` が含まれている場合は、このステップをスキップしてください。
-`output/article.json` の保存のみで完了です。
+`{sessionDir}/article.json` の保存のみで完了です。
 
 `--local` が含まれていない場合は、以下の Bash コマンドを実行して WordPress の既存記事を更新してください：
 
 ```bash
-npx tsx scripts/wp-update-post.ts {originalArticle.id} output/article.json
+npx tsx scripts/wp-update-post.ts {originalArticle.id} {sessionDir}/article.json
 ```
 
 `{originalArticle.id}` は Step 1 で取得した Post ID に置き換えてください。
@@ -505,7 +528,7 @@ npx tsx scripts/wp-update-post.ts {originalArticle.id} output/article.json
 すべてのステップが完了しました。以下をまとめて報告してください：
 - 元の記事タイトル → リライト後のタイトル
 - 主な改善点（箇条書き3〜5個）
-- `output/article.json` のパス
-- レビュー結果の総合評価（`output/review.json`）
-- ファクトチェック結果の総合判定（`output/fact-check.json`）
+- `{sessionDir}/article.json` のパス
+- レビュー結果の総合評価（`{sessionDir}/review.json`）
+- ファクトチェック結果の総合判定（`{sessionDir}/fact-check.json`）
 - WordPress を更新した場合は編集 URL

@@ -64,11 +64,20 @@ scripts/wp-fetch-posts.ts           ← WP REST API: 既存記事取得（複数
 scripts/wp-fetch-post-by-url.ts     ← WP REST API: URL指定で単一記事取得
 scripts/wp-publish-draft.ts         ← WP REST API: 下書き投稿
 scripts/wp-update-post.ts           ← WP REST API: 既存記事更新
-output/article.json                 ← 生成された記事データ（gitignore対象）
-output/review.json                  ← レビュー結果（gitignore対象）
-output/fact-check.json              ← ファクトチェック結果（gitignore対象）
+output/{sessionDir}/article.json     ← 生成された記事データ（gitignore対象）
+output/{sessionDir}/review.json     ← レビュー結果（gitignore対象）
+output/{sessionDir}/fact-check.json ← ファクトチェック結果（gitignore対象）
 cache/style-profiles/{domain}.json  ← 文体分析キャッシュ（gitignore対象）
 ```
+
+### セッションディレクトリ（`output/{sessionDir}/`）
+
+各パイプライン実行時にセッション固有のディレクトリを `output/` 配下に作成し、全出力ファイルをそこに書き出します。複数セッションの同時実行でファイルが競合しません。
+
+- `/generate`: `output/YYYYMMDD-HHMMSS-<keyword>/`
+- `/revise`: `output/YYYYMMDD-HHMMSS-revise-<slug>/`
+- `/edit`: `output/YYYYMMDD-HHMMSS-edit-<slug>/`
+- `/review`, `/fact-check`: 入力ファイルと同じディレクトリに出力
 
 ### 記事生成パイプライン（`/generate`）
 
@@ -80,9 +89,9 @@ Step 0〜9 が順番に実行され、各ステップの出力が次のステッ
 3. **意図深掘り** → `intentDeepDive`（読者の不安・障壁・望む結果）
 4. **差別化設計** → `differentiation`（上位記事を超えるポイント）
 5. **アウトライン** → `outline`（タイトル・メタ・セクション構成）
-6. **本文生成** → `output/article.json`（HTML 形式の記事本文）
-7. **記事レビュー** → `output/review.json`（5カテゴリの品質チェック）
-8. **ファクトチェック** → `output/fact-check.json`（WebSearch による事実検証）
+6. **本文生成** → `{sessionDir}/article.json`（HTML 形式の記事本文）
+7. **記事レビュー** → `{sessionDir}/review.json`（5カテゴリの品質チェック）
+8. **ファクトチェック** → `{sessionDir}/fact-check.json`（WebSearch による事実検証）
 9. **WP投稿**（`--local` 指定時はスキップ）
 
 ### 既存記事リライトパイプライン（`/revise`）
@@ -94,9 +103,9 @@ Step 0〜8 が順番に実行され、各ステップの出力が次のステッ
 2. **記事診断** → `diagnosis`（SEO・構成・可読性・情報鮮度の問題点）
 3. **SEO再調査** → `seoAnalysis`（WebSearch で現在の上位記事を調査）
 4. **リライト方針** → `revisionPlan`（何を残し何を変えるか）
-5. **本文リライト** → `output/article.json`（HTML 形式のリライト記事）
-6. **記事レビュー** → `output/review.json`（5カテゴリの品質チェック）
-7. **ファクトチェック** → `output/fact-check.json`（WebSearch による事実検証）
+5. **本文リライト** → `{sessionDir}/article.json`（HTML 形式のリライト記事）
+6. **記事レビュー** → `{sessionDir}/review.json`（5カテゴリの品質チェック）
+7. **ファクトチェック** → `{sessionDir}/fact-check.json`（WebSearch による事実検証）
 8. **WP更新**（`--local` 指定時はスキップ）
 
 ### 記事レビューパイプライン（`/review`）
@@ -105,7 +114,7 @@ Step 0〜2 が順番に実行される:
 
 0. **文体ロード** → `styleProfile`（キャッシュから。generate と同じロジック）
 1. **記事読み込み** → `article`（article.json を読み込み）
-2. **多角的レビュー** → `output/review.json`（SEO・構成・可読性・文体一貫性・正確性の5カテゴリ）
+2. **多角的レビュー** → `{outputDir}/review.json`（SEO・構成・可読性・文体一貫性・正確性の5カテゴリ）
 
 ### ファクトチェックパイプライン（`/fact-check`）
 
@@ -113,7 +122,7 @@ Step 0〜2 が順番に実行される:
 
 0. **記事読み込み** → `article`（article.json を読み込み）
 1. **主張抽出** → `claims`（数値・手順・因果関係・固有名詞の属性を抽出）
-2. **WebSearch 検証** → `output/fact-check.json`（各主張の verdict + 総合評価）
+2. **WebSearch 検証** → `{outputDir}/fact-check.json`（各主張の verdict + 総合評価）
 
 ### 記事修正パイプライン（`/edit`）
 
@@ -123,8 +132,8 @@ Step 0〜6 が実行される（Step 3 は修正完了までループ）:
 1. **既存記事取得** → `originalArticle`（URL→スラッグ→WP API）
 2. **記事構造表示** → タイトル・見出し構造・文字数を表示
 3. **修正ループ** → ユーザー指示に基づく部分修正（指示→反映→差分表示→繰り返し）
-4. **記事書き出し** → `output/article.json`
-5. **記事レビュー** → `output/review.json`（5カテゴリの並列サブエージェント）
+4. **記事書き出し** → `{sessionDir}/article.json`
+5. **記事レビュー** → `{sessionDir}/review.json`（5カテゴリの並列サブエージェント）
 6. **最終確認 & WP更新**（ユーザー承認後。`--local` 指定時はスキップ）
 
 ### article.json フォーマット
