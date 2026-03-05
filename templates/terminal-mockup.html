@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Mockup</title>
+  <style>
+    /* ========================================
+       Catppuccin Mocha-inspired color palette
+       ======================================== */
+    :root {
+      --ctp-base:      #1e1e2e;
+      --ctp-mantle:    #181825;
+      --ctp-crust:     #11111b;
+      --ctp-surface0:  #313244;
+      --ctp-surface1:  #45475a;
+      --ctp-surface2:  #585b70;
+      --ctp-overlay0:  #6c7086;
+      --ctp-overlay1:  #7f849c;
+      --ctp-text:      #cdd6f4;
+      --ctp-subtext0:  #a6adc8;
+      --ctp-subtext1:  #bac2de;
+      --ctp-red:       #f38ba8;
+      --ctp-yellow:    #f9e2af;
+      --ctp-green:     #a6e3a1;
+      --ctp-blue:      #89b4fa;
+      --ctp-lavender:  #b4befe;
+    }
+
+    /* ========================================
+       Page background
+       ======================================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--ctp-crust);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* ========================================
+       Terminal window
+       ======================================== */
+    .terminal {
+      width: 720px;
+      background-color: var(--ctp-base);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.45),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       Title bar (macOS chrome)
+       ======================================== */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 12px;
+      background-color: var(--ctp-mantle);
+      border-bottom: 1px solid var(--ctp-surface0);
+      position: relative;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .traffic-lights span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .traffic-lights .close  { background-color: #ed6a5e; }
+    .traffic-lights .minimize { background-color: #f4bf4f; }
+    .traffic-lights .maximize { background-color: #61c554; }
+
+    .title-bar-text {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--ctp-overlay1);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ========================================
+       Terminal body
+       ======================================== */
+    .terminal-body {
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ctp-text);
+      overflow-x: auto;
+    }
+
+    /* ========================================
+       Line types
+       ======================================== */
+    .line {
+      white-space: pre;
+      min-height: 1.6em;
+    }
+
+    .prompt {
+      color: var(--ctp-green);
+    }
+
+    .command {
+      color: var(--ctp-text);
+    }
+
+    .output {
+      color: var(--ctp-subtext0);
+    }
+
+    .comment {
+      color: var(--ctp-overlay0);
+    }
+
+    .highlight {
+      color: var(--ctp-yellow);
+    }
+
+    .info {
+      color: var(--ctp-blue);
+    }
+
+    .error {
+      color: var(--ctp-red);
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="title-bar">
+      <div class="traffic-lights">
+        <span class="close"></span>
+        <span class="minimize"></span>
+        <span class="maximize"></span>
+      </div>
+      <div class="title-bar-text">{{TITLE}}</div>
+    </div>
+    <div class="terminal-body">
+{{LINES}}
+    </div>
+  </div>
+</body>
+</html>
