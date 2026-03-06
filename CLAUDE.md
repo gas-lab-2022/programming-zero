@@ -159,7 +159,7 @@ Step 0〜6 が実行される（Step 3 は修正完了までループ）:
 }
 ```
 
-- `seoTitle`: THE THORテーマの「title設定」フィールド。検索結果に表示される `<title>` タグ。投稿タイトルとは別にSEO用に最適化可能。
+- `seoTitle`: SEOタイトル（`<title>` タグ用）。投稿タイトルとは別にSEO用に最適化可能。省略時はテーマが自動生成。
 - `slug`: パーマリンク。`/generate` では既存記事のスラッグパターンを WP API で取得・分析して同じスタイルで新規生成。`/revise` `/edit` では既存スラッグを維持。
 
 ### 文体キャッシュ（`cache/style-profiles/`）
@@ -172,7 +172,8 @@ Step 0〜6 が実行される（Step 3 は修正完了までループ）:
 ## WordPress API
 
 - REST API + Basic Auth（Application Password）で投稿・更新
-- SEOフィールドはテーマ固有のカスタムフィールド → 詳細は [docs/wp-theme-the-thor.md](docs/wp-theme-the-thor.md) を参照
+- SEOフィールドは `.env` の `WP_SEO_METHOD` / `WP_SEO_TITLE_KEY` / `WP_SEO_DESC_KEY` で設定（未設定ならスキップ）
+- テーマ固有の設定例: [docs/wp-theme-the-thor.md](docs/wp-theme-the-thor.md)
 - 認証情報は `.env` に格納（`WP_SITE_URL`, `WP_USERNAME`, `WP_APP_PASSWORD`）
 
 ## Tech Stack
