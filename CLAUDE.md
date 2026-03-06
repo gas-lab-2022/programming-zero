@@ -58,7 +58,7 @@ npx tsc --noEmit
 
 ```
 .claude/skills/generate/SKILL.md    ← 記事生成パイプライン定義（9ステップ、汎用）
-.claude/skills/series-generate/SKILL.md ← シリーズ記事生成（/generate のラッパー、docs/plans/*-series.json を使用）
+.claude/skills/series-generate/SKILL.md ← シリーズ記事生成（3フェーズ: 前処理→/generate委任→後処理、docs/plans/*-series.json を使用）
 .claude/skills/revise/SKILL.md      ← 既存記事リライトパイプライン定義（8ステップ）
 .claude/skills/review/SKILL.md      ← 記事レビューパイプライン定義（3ステップ）
 .claude/skills/fact-check/SKILL.md  ← ファクトチェックパイプライン定義（2ステップ）
@@ -159,6 +159,30 @@ Step 0〜6 が実行される（Step 3 は修正完了までループ）:
 5. **記事レビュー** → `{sessionDir}/review.json`（article-reviewer エージェントに委任）
 6. **最終確認 & WP更新**（ユーザー承認後。対話で「いいえ」選択時はスキップ）
 
+### 実体験データ反映パイプライン（`/incorporate`）
+
+Step 0〜3 が実行される:
+
+0. **入力確認** → セッションディレクトリの特定、handson-tasks.json 読み込み
+1. **タスク一覧表示** → 未処理タスクをユーザーに提示
+2. **タスク処理ループ** → タスクタイプ別に処理（screenshot / terminal-output / text）
+3. **記事保存 & WP更新**（対話で「いいえ」選択時はスキップ）
+
+### スクリーンショットパイプライン（`/screenshot`）
+
+対話で入力確認後、モード別に分岐:
+
+- **Mode A: Web撮影** → URL指定 → Playwright で撮影 → WP メディアアップロード
+- **Mode B: ターミナルモック撮影** → コマンド/出力指定 → HTML テンプレート生成 → Playwright で撮影 → WP メディアアップロード
+
+### シリーズ記事生成パイプライン（`/series-generate`）
+
+3フェーズで実行（Phase 2 は `/generate` に委任）:
+
+- **Phase 1: シリーズ前処理** → シリーズ選択 → 設計ドキュメント読込 → 対象記事選択 → 既存公開記事URL取得 → seriesContext 構築 → ユーザー確認
+- **Phase 2: /generate パイプライン実行**（seriesContext を渡して委任）
+- **Phase 3: シリーズ後処理** → SEOフィールド設定 → シリーズ計画更新 → 内部リンク追加提案 → 次の記事表示
+
 ### article.json フォーマット
 
 ```json
@@ -185,7 +209,7 @@ Step 0〜6 が実行される（Step 3 は修正完了までループ）:
 ## WordPress API
 
 - REST API + Basic Auth（Application Password）で投稿・更新
-- SEOフィールドは `.env` の `WP_SEO_METHOD` / `WP_SEO_TITLE_KEY` / `WP_SEO_DESC_KEY` で設定（未設定ならスキップ）
+- SEOフィールドは `.env` の `WP_SEO_METHOD`（`xmlrpc` | `none`）/ `WP_SEO_TITLE_KEY` / `WP_SEO_DESC_KEY` で設定（未設定ならスキップ）
 - テーマ固有の設定例: [docs/wp-theme-the-thor.md](docs/wp-theme-the-thor.md)
 - 認証情報は `.env` に格納（`WP_SITE_URL`, `WP_USERNAME`, `WP_APP_PASSWORD`）
 
