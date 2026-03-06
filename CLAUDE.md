@@ -98,7 +98,7 @@ Step 0〜9 が順番に実行され、各ステップの出力が次のステッ
 
 0. **文体分析** → `styleProfile`（style-loader エージェントに委任）
 1. **キーワード分析** → `keywordAnalysis`（表層意図・潜在意図・最終ゴール）
-2. **SEO分析** → `seoAnalysis`（WebSearch で上位記事を調査）
+2. **SEO分析** → `seoAnalysis`（一次情報収集 → 実体験検証候補の洗い出し → 競合記事調査）
 3. **意図深掘り** → `intentDeepDive`（読者の不安・障壁・望む結果）
 4. **差別化設計** → `differentiation`（上位記事を超えるポイント）
 5. **アウトライン** → `outline`（タイトル・メタ・セクション構成）
