@@ -7,3 +7,4 @@ cache/*.json
 cache/**/*.json
 output/**/*.png
 output/**/*.html
+.playwright-mcp
