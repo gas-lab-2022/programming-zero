@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "id": 1,
+      "claim": "Claude CodeはAnthropic社が開発した",
+      "category": "固有名詞の属性",
+      "verdict": "verified",
+      "evidence": "Claude CodeはAnthropic社が開発・公開しているエージェント型コーディングツール。GitHubリポジトリ（anthropics/claude-code）や公式サイト（claude.com/product/claude-code）で確認済み。",
+      "suggestion": null
+    },
+    {
+      "id": 2,
+      "claim": "Claude Codeは2025年にリリースされた",
+      "category": "固有名詞の属性",
+      "verdict": "verified",
+      "evidence": "Claude Codeは2025年2月にプレビュー版としてリリースされ、2025年5月にClaude 4と同時に一般提供（GA）が開始された。",
+      "suggestion": null
+    },
+    {
+      "id": 3,
+      "claim": "Claude Codeは最大100万トークンのコンテキストウィンドウを持つ",
+      "category": "数値・統計",
+      "verdict": "disputed",
+      "evidence": "Claude Opus 4.6やSonnet 4.6などのモデルは100万トークンのコンテキストウィンドウに対応しているが、これはBeta機能であり、デフォルトでは200Kトークンのコンテキストウィンドウが使用される。また、Usage Tier 4以上の組織またはカスタムレート制限のある組織のみが利用可能。Claude Code自体のコンテキストウィンドウとモデルのAPIコンテキストウィンドウは異なる場合がある。",
+      "suggestion": "「最大100万トークンのコンテキストウィンドウを持つ」→「使用するモデル（Opus 4.6、Sonnet 4.6等）は最大100万トークンのコンテキストウィンドウに対応（Beta機能、デフォルトは200K）」のように条件を明記することを推奨。"
+    },
+    {
+      "id": 4,
+      "claim": "Terminal/VSCode/JetBrains/Desktop/Web/Slackで利用可能",
+      "category": "手順・仕様",
+      "verdict": "verified",
+      "evidence": "Anthropic公式（Boris Cherny氏のThreads投稿）にて、Claude CodeはTerminal、Desktop、Web、iOS、Android、VSCode、JetBrains、GitHub、Slackでネイティブに利用可能と確認。記事に記載されたプラットフォームはすべて正確。さらにiOS/Android/GitHubも利用可能。",
+      "suggestion": null
+    },
+    {
+      "id": 5,
+      "claim": "MCP（Model Context Protocol）はオープンスタンダード",
+      "category": "手順・仕様",
+      "verdict": "verified",
+      "evidence": "MCPはAnthropicが2024年11月に発表したオープンプロトコルで、AIシステムと外部データソース・ツールを接続するための標準仕様。OpenAI・Microsoftも採用を表明し、2025年12月にはAgentic AI Foundationに寄贈された。",
+      "suggestion": null
+    },
+    {
+      "id": 6,
+      "claim": "無料プランでは利用不可、Proプラン$20/月から",
+      "category": "数値・統計",
+      "verdict": "verified",
+      "evidence": "Claude Codeは無料プランでは利用不可。Pro（$20/月）以上のサブスクリプションまたはAPIキーが必要。Anthropic公式ヘルプセンターおよび複数の価格比較サイトで確認済み。",
+      "suggestion": null
+    },
+    {
+      "id": 7,
+      "claim": "Max 5x $100/月、Max 20x $200/月",
+      "category": "数値・統計",
+      "verdict": "verified",
+      "evidence": "Claude Max 5xは$100/月、Max 20xは$200/月。Anthropic公式価格ページ（claude.com/pricing/max）および複数の情報源で確認済み。",
+      "suggestion": null
+    },
+    {
+      "id": 8,
+      "claim": "Teamプラン $30/人/月",
+      "category": "数値・統計",
+      "verdict": "verified",
+      "evidence": "TeamプランのStandardシートは月額払いで$30/人/月、年払いで$25/人/月。$30/人/月は月額払い時の価格として正確。Anthropic公式ヘルプセンターで確認済み。",
+      "suggestion": "より正確には「$30/人/月（月払い）、$25/人/月（年払い）」と記載すると親切。"
+    },
+    {
+      "id": 9,
+      "claim": "2026年現在ネイティブインストーラーが推奨、Node.js不要",
+      "category": "手順・仕様",
+      "verdict": "verified",
+      "evidence": "Anthropic公式（Threads投稿）にて「Claude Code's native installer is now generally available. It's simpler, more stable, and doesn't require Node.js. We recommend this as the default installation method for all Claude Code users going forward.」と確認。複数の2026年ガイドでもNode.js不要と記載。",
+      "suggestion": null
+    },
+    {
+      "id": 10,
+      "claim": "インストールコマンド: curl -fsSL https://claude.ai/install.sh | bash",
+      "category": "手順・仕様",
+      "verdict": "verified",
+      "evidence": "Anthropic公式ドキュメント（code.claude.com/docs/en/setup）および複数のインストールガイドで、macOS/Linuxでのインストールコマンドとして「curl -fsSL https://claude.ai/install.sh | bash」が記載されていることを確認。",
+      "suggestion": null
+    },
+    {
+      "id": 11,
+      "claim": "Anthropicはユーザーデータをモデルトレーニングに使用しない",
+      "category": "手順・仕様",
+      "verdict": "outdated",
+      "evidence": "2025年8月以前はAnthropicはコンシューマーチャットデータをモデルトレーニングに使用していなかったが、2025年8月にポリシーが変更され、オプトアウト方式に移行。ユーザーが設定でオフにしない限り、チャットデータはモデルトレーニングに使用される。ただし、Commercial Terms（Claude for Work、API経由等）には適用されず、これらのデータはトレーニングに使用されない。",
+      "suggestion": "「ユーザーデータをモデルトレーニングに使用しない」→「コンシューマー向けサービスでは2025年8月以降オプトアウト方式を採用（設定でオフ可能）。商用プラン（Team/Enterprise）およびAPI利用ではデータはトレーニングに使用されない」に修正を推奨。"
+    }
+  ],
+  "verifiedCount": 9,
+  "totalCount": 11,
+  "overallVerdict": "warning",
+  "summary": "11件の事実主張のうち9件が検証済み（verified）、1件が要注意（disputed: コンテキストウィンドウ100万トークンはBeta機能であり条件付き）、1件が情報更新が必要（outdated: データトレーニング不使用ポリシーは2025年8月に変更済み）。特にデータプライバシーに関する主張は最新のポリシー変更を反映する修正が必要です。",
+  "checkedAt": "2026-03-07T17:50:00+09:00"
+}
