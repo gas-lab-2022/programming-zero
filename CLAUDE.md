@@ -75,6 +75,7 @@ npx tsc --noEmit
 .claude/skills/illustrate/SKILL.md  ← 図解画像生成（Gemini CLI + Nanobanana、フロー図・ステップ図・概念図）
 .claude/skills/screenshot/SKILL.md  ← スクリーンショット撮影（Web + ターミナルモック）
 templates/terminal-mockup.html      ← ターミナル風HTMLテンプレート
+docs/plans/                            ← 設計ドキュメント・実装計画
 docs/series/{domain}/{slug}/series.md ← シリーズ記事管理ファイル（Markdown + YAML frontmatter）
 docs/series/{domain}/{slug}/design.md ← シリーズ設計ドキュメント（任意）
 .claude/agents/style-loader.md      ← 共通エージェント: 文体キャッシュ読込/分析
