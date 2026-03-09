@@ -5,11 +5,14 @@ designDoc: docs/plans/2026-03-08-series-redesign.md
 ---
 
 ## #1 — AI 業務効率化【気づく】
-- **Title**: AIで業務を自動化する時代に非エンジニアが知っておくべきこと
+- **Title**: 【AI業務効率化】非エンジニアが知るべき「自動化の新常識」とは
 - **Sub KW**: AI 自動化 ツール, 業務 自動化 AI
 - **Priority**: 2
-- **Status**: draft
+- **Status**: pr-created
 - **Related**: 2, 3
+- **wpPostId**: 7011
+- **wpUrl**: null
+- **prUrl**: https://github.com/gas-lab-2022/article-pipeline/pull/6
 - **Description**: 2026年のAI活用の現状。GAS・ノーコードの限界とAIコーディングという新選択肢。
 
 ## #2 — エンジニア不要 AI【気づく】
