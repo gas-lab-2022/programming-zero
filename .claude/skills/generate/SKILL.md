@@ -576,38 +576,7 @@ mkdir -p articles/{domain}/{slug}/screenshots
 cp {sessionDir}/screenshots/*.png articles/{domain}/{slug}/screenshots/ 2>/dev/null || true
 ```
 
-### 9-3. article.md の生成
-
-`article.json` の内容をレビュー用の Markdown ファイルとして `articles/{domain}/{slug}/article.md` に変換・書き出してください。
-
-フォーマット：
-
-```markdown
----
-title: "{title}"
-slug: "{slug}"
-metaDescription: "{metaDescription}"
-tags: [{tags}]
----
-
-（htmlContent を Markdown に変換した本文）
-```
-
-変換ルール：
-- `<h2>` → `## `
-- `<h3>` → `### `
-- `<p>` → 段落テキスト（タグ除去）
-- `<a href="URL">text</a>` → `[text](URL)`
-- `<strong>` → `**text**`
-- `<em>` → `*text*`
-- `<ul><li>` → `- item`
-- `<ol><li>` → `1. item`
-- `<figure>` → `![alt](src)`（画像）
-- `<code>` → `` `code` ``
-- `<pre>` → コードブロック
-- その他の HTML タグ → タグ除去してテキストのみ残す
-
-### 9-4. WP 下書き投稿（プレビュー用）
+### 9-3. WP 下書き投稿（プレビュー用）
 
 記事を WordPress に下書き投稿して、プレビュー URL を取得します：
 
@@ -621,7 +590,7 @@ npx tsx scripts/wp-publish-draft.ts "articles/{domain}/{slug}/article.json"
 2. プレビュー URL を `previewUrl` として保持：`{WP_SITE_URL}/?p={postId}&preview=true`
 3. 編集 URL を `editUrl` として保持：`{WP_SITE_URL}/wp-admin/post.php?post={postId}&action=edit`
 
-### 9-5. コミット & プッシュ
+### 9-4. コミット & プッシュ
 
 ```bash
 git add articles/{domain}/{slug}/
@@ -629,7 +598,7 @@ git commit -m "feat: add article '{title}'"
 git push -u origin article/{domain}/{slug}
 ```
 
-### 9-6. PR 作成
+### 9-5. PR 作成
 
 `gh pr create` で PR を作成してください。PR body は以下のテンプレートで生成：
 
@@ -720,7 +689,6 @@ PR が作成されたら、PR URL を取得して表示してください。
 すべてのステップが完了しました。以下をまとめて報告してください：
 - 記事タイトル
 - `{sessionDir}/article.json` のパス（ローカル作業用）
-- `articles/{domain}/{slug}/article.md` のパス（PR レビュー用）
 - レビュー結果の総合評価（`{sessionDir}/review.md`）
 - ファクトチェック結果の総合判定（`{sessionDir}/fact-check.md`）
 - PR を作成した場合は PR URL
