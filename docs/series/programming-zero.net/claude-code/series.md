@@ -24,8 +24,11 @@ designDoc: docs/series/programming-zero.net/claude-code/design.md
 - **Title**: Claude Codeとは？非エンジニアこそ使うべき理由
 - **Sub KW**: Claude Code 非エンジニア, AIコーディング 非エンジニア
 - **Priority**: 1
-- **Status**: draft
+- **Status**: pr-created
 - **Related**: 1, 2, 4, 5
+- **wpPostId**: 6992
+- **wpUrl**: null
+- **prUrl**: https://github.com/gas-lab-2022/article-pipeline/pull/5
 - **Description**: Claude Codeの概要を非エンジニア向けに図解で解説。なぜ非エンジニアに向いているのか。
 
 ## #4 — Claude Code 料金【知る】
