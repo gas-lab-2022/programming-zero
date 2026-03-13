@@ -424,6 +424,33 @@ rm -f {sessionDir}/screenshots/_temp-terminal.html
 kill $(lsof -ti:3847) 2>/dev/null
 ```
 
+### 6.5-2.5. 機密情報のモザイク処理
+
+撮影したスクリーンショットに **API キー・パスワード・トークン・シークレット** などの機密情報が映り込んでいる場合は、WP アップロード前にモザイク（ピクセレート）処理を施してください。
+
+**対象**: 生成されたパスワード、アクセストークン、API キー、シークレットキーなど、そのまま公開すべきでない文字列。削除済み・無効化済みの値であってもモザイクをかけること（読者に不安を与えないため）。
+
+**処理方法**（Python Pillow）:
+
+```python
+python3 << 'PYEOF'
+from PIL import Image
+
+img = Image.open("{sessionDir}/screenshots/screenshot-{N}.png")
+
+# 機密情報が表示されている矩形領域の座標を指定
+x1, y1, x2, y2 = <左>, <上>, <右>, <下>
+
+region = img.crop((x1, y1, x2, y2))
+small = region.resize((10, 3), Image.NEAREST)
+mosaic = small.resize(region.size, Image.NEAREST)
+img.paste(mosaic, (x1, y1))
+img.save("{sessionDir}/screenshots/screenshot-{N}.png")
+PYEOF
+```
+
+座標は Read ツールで画像を確認し、機密情報の表示位置を目視で特定してください。
+
 ### 6.5-3. WP メディアアップロード & 記事挿入
 
 `isLocal` が true の場合は、`<!-- SCREENSHOT:N -->` プレースホルダーを記事 HTML から除去し、撮影したスクリーンショットのローカルパスをコンソールに表示して完了。

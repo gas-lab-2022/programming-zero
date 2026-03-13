@@ -15,6 +15,10 @@ WordPress ブログの記事生成パイプライン。`.env` の `WP_SITE_URL` 
 # PR マージ時に GitHub Actions で WP に自動投稿
 /generate
 
+# マニュアル記事生成（対話形式: ソースファイル・関連記事・PR作成を質問）
+# README等のソースドキュメントからツール利用マニュアル・設定ガイドを生成
+/generate-manual
+
 # 既存記事リライト（対話形式: URL・WP更新を質問）
 /revise
 
@@ -65,6 +69,7 @@ npx tsc --noEmit
 
 ```
 .claude/skills/generate/SKILL.md    ← 記事生成パイプライン定義（9ステップ、汎用）
+.claude/skills/generate-manual/SKILL.md ← マニュアル記事生成（6ステップ、ソースドキュメントベース、吹き出しなし）
 .claude/skills/series-generate/SKILL.md ← シリーズ記事生成（3フェーズ: 前処理→/generate委任→後処理、docs/series/{domain}/*/series.md を使用）
 .claude/skills/series-status/SKILL.md  ← シリーズ進捗ステータス表示
 .claude/skills/revise/SKILL.md      ← 既存記事リライトパイプライン定義（8ステップ）
@@ -140,6 +145,19 @@ Step 0〜9 が順番に実行され、各ステップの出力が次のステッ
 7. **記事レビュー** → `{sessionDir}/review.md`（article-reviewer エージェントに委任）
 8. **ファクトチェック** → `{sessionDir}/fact-check.md`（fact-checker エージェントに委任）
 9. **PR作成** → WP 下書き投稿（プレビュー用）→ ブランチ作成 → `articles/{domain}/{slug}/` にファイル配置 → PR 作成（対話で「いいえ」選択時はスキップ。PR に WP プレビュー URL を記載。マージ時に GitHub Actions で下書きを公開に更新）
+
+### マニュアル記事生成パイプライン（`/generate-manual`）
+
+Step 0〜6 が順番に実行される。`/generate` との違い: SEO分析・差別化設計をスキップし、ソースドキュメント（README等）の翻訳・整形に特化。吹き出し不使用:
+
+0. **文体分析** → `styleProfile`（style-loader エージェントに委任）
+1. **ソース分析** → `sourceAnalysis`（ソースドキュメントから機能・手順・制約・注意点を抽出）
+2. **アウトライン** → `outline`（固定構成: 概要→STEP手順→データ一覧→注意点→Q&A）
+3. **本文生成** → `{sessionDir}/article.json`（HTML 形式、リスト中心、吹き出しなし）
+3.5. **スクリーンショット生成** → Playwright でスクリーンショット撮影 → WP メディアアップロード → 記事 HTML に `<figure>` 挿入（空ならスキップ）
+4. **記事レビュー** → `{sessionDir}/review.md`（article-reviewer エージェントに委任）
+5. **ファクトチェック** → `{sessionDir}/fact-check.md`（fact-checker エージェントに委任）
+6. **PR作成** → WP 下書き投稿 → ブランチ作成 → `articles/{domain}/{slug}/` にファイル配置 → PR 作成（対話で「いいえ」選択時はスキップ）
 
 ### 既存記事リライトパイプライン（`/revise`）
 
